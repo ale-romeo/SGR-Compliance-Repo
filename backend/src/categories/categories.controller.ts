@@ -1,0 +1,23 @@
+import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+
+@ApiTags('categories')
+@Controller('categories')
+export class CategoriesController {
+  constructor(private readonly service: CategoriesService) {}
+
+  @Get()
+  @ApiResponse({ status: 200, description: 'List of categories' })
+  async findAll() {
+    return this.service.findAll();
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({ status: 201, description: 'Category created' })
+  async create(@Body() dto: CreateCategoryDto) {
+    return this.service.create(dto);
+  }
+}

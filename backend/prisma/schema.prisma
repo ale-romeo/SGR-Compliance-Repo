@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id    String   @id @default(uuid())
+  name  String   @unique
+  // Relations
+  products Product[]
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String
+  price       Decimal   @db.Decimal(10, 2)
+  tags        String[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  categoryId  String?   @map("category_id")
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt], map: "idx_products_created_at")
+  @@index([price], map: "idx_products_price")
+  @@index([categoryId], map: "idx_products_category_id")
+}
