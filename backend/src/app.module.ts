@@ -4,7 +4,7 @@ import * as Joi from 'joi';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './health.controller';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 
@@ -26,12 +26,12 @@ import { ProductsModule } from './products/products.module';
         limit: Number(process.env.RATE_LIMIT_MAX) || 100,
       },
     ]),
+    PrismaModule,
     CategoriesModule,
     ProductsModule,
   ],
   controllers: [HealthController],
   providers: [
-    PrismaService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

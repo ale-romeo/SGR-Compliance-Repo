@@ -1,25 +1,16 @@
-import { Transform } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { z } from 'zod';
 
-export class PaginationQueryDto {
-  @IsOptional()
-  @Transform(({ value }) => (value !== undefined ? parseInt(value, 10) : 1))
-  @IsInt()
-  @Min(1)
-  page?: number = 1;
+export const PaginationQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+});
 
-  @IsOptional()
-  @Transform(({ value }) => (value !== undefined ? parseInt(value, 10) : 20))
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  pageSize?: number = 20;
-}
+export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
 
-export type SortOrder = 'asc' | 'desc';
+export const SortOrderEnum = z.enum(['asc', 'desc']);
+export type SortOrder = z.infer<typeof SortOrderEnum>;
 
-export class SortQueryDto {
-  @IsOptional()
-  @IsIn(['asc', 'desc'])
-  sortOrder?: SortOrder = 'desc';
-}
+export const SortQuerySchema = z.object({
+  sortOrder: SortOrderEnum.default('desc').optional(),
+});
+export type SortQuery = z.infer<typeof SortQuerySchema>;

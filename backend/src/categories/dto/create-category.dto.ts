@@ -1,10 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { z } from 'zod';
 
-export class CreateCategoryDto {
-  @ApiProperty({ example: 'Electronics' })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
-  name!: string;
-}
+export const CreateCategorySchema = z.object({
+  name: z.string().min(1).max(120),
+});
+
+export type CreateCategoryDto = z.infer<typeof CreateCategorySchema>;

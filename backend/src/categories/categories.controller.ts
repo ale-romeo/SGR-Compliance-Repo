@@ -1,7 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateCategoryDto, CreateCategorySchema } from './dto/create-category.dto';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -17,7 +18,7 @@ export class CategoriesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({ status: 201, description: 'Category created' })
-  async create(@Body() dto: CreateCategoryDto) {
+  async create(@Body(new ZodValidationPipe(CreateCategorySchema)) dto: CreateCategoryDto) {
     return this.service.create(dto);
   }
 }

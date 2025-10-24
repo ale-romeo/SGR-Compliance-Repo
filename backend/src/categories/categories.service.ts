@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoriesService {
-  async findAll(): Promise<any[]> {
-    // TODO: implement with Prisma: return prisma.category.findMany({ orderBy: { name: 'asc' } })
-    return [];
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll() {
+    return this.prisma.category.findMany({ orderBy: { name: 'asc' } });
   }
 
-  async create(dto: CreateCategoryDto): Promise<any> {
-    // TODO: implement with Prisma: return prisma.category.create({ data: dto })
-    return { id: 'todo', ...dto };
+  async create(dto: CreateCategoryDto) {
+    try {
+      return await this.prisma.category.create({ data: { name: dto.name } });
+    } catch (e: any) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        throw new ConflictException('Category name already exists');
+      }
+      throw e;
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import { ValidationPipe } from '@nestjs/common';
+// Removed class-validator based ValidationPipe; using Zod pipes per-route
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -22,15 +22,7 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization']
   });
 
-  // Validation
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true }
-    }),
-  );
+  // Validation handled via Zod pipes at route level
 
   // Swagger (dev only)
   if (process.env.NODE_ENV !== 'production') {
