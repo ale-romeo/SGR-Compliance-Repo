@@ -19,8 +19,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U app_user -d app_db" \
-          --health-interval 10s --health-timeout 5s --health-retries 10
+          --health-cmd="pg_isready -U app_user -d app_db" --health-interval=10s --health-timeout=5s --health-retries=10
     defaults:
       run:
         working-directory: backend
@@ -36,7 +35,7 @@ jobs:
       - name: Wait for Postgres
         run: |
           for i in {1..30}; do
-            pg_isready -h localhost -p 5432 -U app_user -d app_db && break
+            node -e "require('net').connect(5432,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))" && break
             sleep 2
           done
       - run: npm run prisma:deploy
