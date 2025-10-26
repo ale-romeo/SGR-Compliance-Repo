@@ -111,7 +111,7 @@ SGR-Compliance-Repo/
 
 —
 
-## Scelte tecniche e sicurezza ("non voglio vulnerabilità")
+## Scelte tecniche e sicurezza
 
 - Validazione robusta con Zod (nestjs-zod): tutti i DTO usano schemi dichiarativi e sicuri.
 - Sicurezza HTTP: Helmet (header sicuri), CORS ristretto all’origin del FE, Throttler configurabile (rate limit).
