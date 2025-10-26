@@ -9,6 +9,18 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app_db
+          POSTGRES_USER: app_user
+          POSTGRES_PASSWORD: app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app_user -d app_db" \
+          --health-interval 10s --health-timeout 5s --health-retries 10
     defaults:
       run:
         working-directory: backend
@@ -20,9 +32,21 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      - run: npm run prisma:generate
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U app_user -d app_db && break
+            sleep 2
+          done
+      - run: npm run prisma:deploy
+        env:
+          DATABASE_URL: postgresql://app_user:app_password@localhost:5432/app_db?schema=public
       - run: npm run lint
       - run: npm run build
       - run: npm test
+        env:
+          DATABASE_URL: postgresql://app_user:app_password@localhost:5432/app_db?schema=public
 
   frontend:
     runs-on: ubuntu-latest
