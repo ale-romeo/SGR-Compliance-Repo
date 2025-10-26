@@ -225,16 +225,3 @@ cd ../frontend
 npm run lint && npm run typecheck && npm run build
 ```
 
-—
-
-## Troubleshooting
-
-- "Il sort non sembra cambiare": i dati seed impostano `created_at` distribuiti e il FE di default ordina per `price` così l’effetto è evidente. Prova a cambiare `sortBy`/`sortOrder` dalla UI.
-- CORS in locale: assicurati che `CORS_ORIGIN` nel backend corrisponda all’origin del FE (`http://localhost:5173`).
-- Migrazioni in CI: usiamo `prisma migrate deploy` per ambienti non interattivi.
-
-—
-
-## Licenza
-
-Questo progetto è per scopi dimostrativi/valutazione. Tutti i marchi citati appartengono ai rispettivi proprietari.
