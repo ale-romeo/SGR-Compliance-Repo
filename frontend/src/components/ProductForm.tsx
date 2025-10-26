@@ -57,8 +57,15 @@ export default function ProductForm({ productId, onSaved }: { productId?: string
     setForm((f) => ({ ...f, [name]: value }))
   }
 
+  type UpsertPayload = {
+    name: string
+    price: string
+    categoryId?: string
+    tags: string[]
+  }
+
   const mutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: UpsertPayload) => {
       if (isEdit) return (await api.put(`/products/${productId}`, payload)).data
       return (await api.post('/products', payload)).data
     },

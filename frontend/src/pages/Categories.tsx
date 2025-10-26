@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
+import { isAxiosError } from 'axios'
 import { useState } from 'react'
 
 type Category = { id: string; name: string }
@@ -24,8 +25,13 @@ export default function Categories() {
       setErrMsg('')
       await qc.invalidateQueries({ queryKey: ['categories'] })
     },
-    onError: (e: any) => {
-      const msg = e?.response?.data?.message || 'Failed to create category'
+    onError: (e: unknown) => {
+      let msg: unknown = 'Failed to create category'
+      if (isAxiosError(e)) {
+        msg = e.response?.data?.message ?? msg
+      } else if (e && typeof e === 'object' && 'message' in e) {
+        msg = (e as { message?: unknown }).message ?? msg
+      }
       setErrMsg(Array.isArray(msg) ? msg.join(', ') : String(msg))
     },
   })

@@ -13,7 +13,17 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  settings: { react: { version: 'detect' } },
+  settings: {
+    react: { version: 'detect' },
+    'import/resolver': {
+      typescript: {
+        project: ['./tsconfig.json'],
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+  },
   rules: {
     'react/react-in-jsx-scope': 'off',
     'import/order': [

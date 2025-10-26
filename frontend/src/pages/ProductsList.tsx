@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useState } from 'react'
 import Modal from '@/components/Modal'
