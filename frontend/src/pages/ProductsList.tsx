@@ -1,7 +1,10 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { useQuery, keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useMemo } from 'react'
+import { useState } from 'react'
+import Modal from '@/components/Modal'
+import ProductForm from '@/components/ProductForm'
 
 interface Product {
   id: string
@@ -36,7 +39,7 @@ export default function ProductsList() {
   const categoryId = sp.get('categoryId') || ''
   const minPrice = sp.get('minPrice') || ''
   const maxPrice = sp.get('maxPrice') || ''
-  const sortBy = sp.get('sortBy') || 'created_at'
+  const sortBy = sp.get('sortBy') || 'price'
   const sortOrder = sp.get('sortOrder') || 'desc'
   const view = sp.get('view') || 'table' // 'table' | 'grid'
 
@@ -112,6 +115,8 @@ export default function ProductsList() {
 
   const total = data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const [modal, setModal] = useState<{ mode: 'create' | 'edit'; id?: string } | null>(null)
+  const qc = useQueryClient()
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div className="text-red-600">Error loading products</div>
@@ -133,7 +138,7 @@ export default function ProductsList() {
             type="button"
             title="Reset filters"
           >Reset</button>
-          <Link to="/products/new" className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md">New</Link>
+          <button onClick={() => setModal({ mode: 'create' })} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md">New</button>
         </div>
       </div>
 
@@ -170,9 +175,9 @@ export default function ProductsList() {
           value={maxPrice}
           onChange={(e)=>updateParams({ maxPrice: e.target.value })}
         />
-        <div className="flex gap-2">
+        <div className="md:col-span-2 grid grid-cols-2 gap-2 min-w-0">
           <select
-            className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={sortBy}
             onChange={(e)=>updateParams({ sortBy: e.target.value })}
           >
@@ -180,7 +185,7 @@ export default function ProductsList() {
             <option value="price">Price</option>
           </select>
           <select
-            className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={sortOrder}
             onChange={(e)=>updateParams({ sortOrder: e.target.value })}
           >
@@ -213,7 +218,7 @@ export default function ProductsList() {
                   </div>
                 </td>
                 <td className="p-2 border border-gray-200">
-                  <Link to={`/products/${p.id}`} className="text-blue-600">Edit</Link>
+                  <button onClick={() => setModal({ mode: 'edit', id: p.id })} className="text-blue-600">Edit</button>
                 </td>
               </tr>
             )) : (
@@ -240,7 +245,7 @@ export default function ProductsList() {
                     )) : <span className="text-xs text-gray-400">no tags</span>}
                   </div>
                   <div className="mt-3">
-                    <Link to={`/products/${p.id}`} className="text-blue-600 text-sm">Edit</Link>
+                    <button onClick={() => setModal({ mode: 'edit', id: p.id })} className="text-blue-600 text-sm">Edit</button>
                   </div>
                 </div>
               ))}
@@ -250,6 +255,24 @@ export default function ProductsList() {
           )}
         </div>
       )}
+
+      <Modal
+        open={modal !== null}
+        onClose={() => setModal(null)}
+        title={modal?.mode === 'edit' ? 'Edit product' : 'New product'}
+        widthClass="max-w-2xl"
+      >
+        <ProductForm
+          productId={modal?.mode === 'edit' ? modal.id : undefined}
+          onSaved={async () => {
+            await qc.invalidateQueries({ queryKey: ['products'] })
+            setModal(null)
+          }}
+        />
+        <div className="mt-4 flex justify-end">
+          <button className="px-3 py-2 border border-gray-300 rounded-md" onClick={() => setModal(null)}>Close</button>
+        </div>
+      </Modal>
 
       <div className="flex items-center justify-between mt-3">
         <div className="text-sm text-gray-600">Total: {total}</div>

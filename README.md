@@ -63,3 +63,79 @@
 - **Correttezza API e validazioni**  
 - **UX essenziale del frontend**  
 - **Developer Experience (README, avvio rapido, migrazioni/test di base)**
+
+---
+
+## Avvio rapido (Docker Compose)
+
+Prerequisiti: Docker e Docker Compose.
+
+1. Build e avvio stack (DB + API + Frontend)
+  - Il frontend viene esposto su http://localhost:5173
+  - L'API è su http://localhost:3000/api/v1
+
+```
+docker compose up --build
+```
+
+2. (Opzionale) Popola il DB con dati di esempio
+
+```
+docker compose exec api npm run prisma:seed
+```
+
+3. Verifica lo stato
+  - API health: http://localhost:3000/api/v1/health
+  - Swagger (dev): http://localhost:3000/api-docs
+
+## Avvio locale (senza Docker)
+
+Backend:
+
+```
+cd backend
+npm ci
+npm run prisma:generate
+npm run prisma:migrate
+npm run start:dev
+```
+
+Frontend:
+
+```
+cd frontend
+npm ci
+npm run dev
+```
+
+## Lint, build, test
+
+Backend:
+
+```
+cd backend
+npm run lint
+npm run build
+npm test
+```
+
+Frontend:
+
+```
+cd frontend
+npm run lint
+npm run typecheck
+npm run build
+```
+
+## Sicurezza e validazione
+
+- Validazione request tramite Zod pipes per DTO
+- CORS limitato all'origin del frontend
+- Helmet abilitato
+- Rate limiting configurabile con Throttler (abilitabile facilmente)
+
+## Note
+
+- La variabile `VITE_API_BASE_URL` può essere impostata in build del frontend Docker per puntare all'API (default: `http://localhost:3000/api/v1`).
+- Lo seed assegna anche timestamp diversi ai prodotti per evidenziare l'ordinamento per data.
