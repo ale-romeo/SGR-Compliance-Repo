@@ -1,0 +1,1 @@
+{"version":3,"file":"create-category.dto.js","sourceRoot":"","sources":["../../../src/categories/dto/create-category.dto.ts"],"names":[],"mappings":";;;AAAA,6BAAwB;AAEX,QAAA,oBAAoB,GAAG,OAAC,CAAC,MAAM,CAAC;IAC3C,IAAI,EAAE,OAAC,CAAC,MAAM,EAAE,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,GAAG,CAAC;CACjC,CAAC,CAAC"}

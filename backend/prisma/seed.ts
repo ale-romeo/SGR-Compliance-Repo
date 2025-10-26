@@ -1,51 +1,49 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
+
+function pick<T>(arr: T[], n: number): T[] {
+  const copy = [...arr]
+  const out: T[] = []
+  while (out.length < n && copy.length) {
+    const i = Math.floor(Math.random() * copy.length)
+    out.push(copy.splice(i, 1)[0])
+  }
+  return out
+}
 
 async function main() {
-  const catNames = ['Electronics', 'Books', 'Home'];
+  // Start clean for dev/demo purposes
+  await prisma.product.deleteMany()
+  await prisma.category.deleteMany()
+
+  const categoriesData = ['Electronics', 'Books', 'Home', 'Toys', 'Outdoors', 'Office']
   const categories = await Promise.all(
-    catNames.map((name) =>
-      prisma.category.upsert({
-        where: { name },
-        update: {},
-        create: { name },
-      }),
-    ),
-  );
+    categoriesData.map((name) => prisma.category.create({ data: { name } }))
+  )
 
-  const [electronics, books, home] = categories;
+  const adjectives = ['Wireless', 'Smart', 'Portable', 'Compact', 'Durable', 'Eco', 'Pro', 'Lite', 'Ultra', 'Classic']
+  const nouns = ['Mouse', 'Headphones', 'Speaker', 'Notebook', 'Backpack', 'Bottle', 'Lamp', 'Chair', 'Kettle', 'Charger', 'Keyboard', 'Camera', 'Book', 'Mug']
+  const tagPool = ['gadget', 'home', 'office', 'kitchen', 'audio', 'eco', 'new', 'sale', 'gift', 'premium']
 
-  await prisma.product.createMany({
-    data: [
-      {
-        name: 'Wireless Mouse',
-        price: new Prisma.Decimal(19.99),
-        categoryId: electronics.id,
-        tags: ['gadget', 'accessory'],
-      },
-      {
-        name: 'TypeScript Handbook',
-        price: new Prisma.Decimal(29.9),
-        categoryId: books.id,
-        tags: ['book', 'typescript'],
-      },
-      {
-        name: 'Electric Kettle',
-        price: new Prisma.Decimal(49.0),
-        categoryId: home.id,
-        tags: ['kitchen'],
-      },
-    ],
-    skipDuplicates: true,
-  });
+  const products: Prisma.ProductCreateManyInput[] = Array.from({ length: 60 }).map(() => {
+    const name = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`
+    const price = new Prisma.Decimal((Math.random() * 490 + 10).toFixed(2))
+    const category = categories[Math.floor(Math.random() * categories.length)]
+    const tags = pick(tagPool, Math.floor(Math.random() * 3))
+    return { name, price, categoryId: category.id, tags }
+  })
+
+  await prisma.product.createMany({ data: products })
+
+  console.log(`Seeded ${categories.length} categories and ${products.length} products`)
 }
 
 main()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error(e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })
