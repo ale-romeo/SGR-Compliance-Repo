@@ -71,4 +71,24 @@ describe('ProductsService', () => {
       }),
     )
   })
+
+  it('returns empty page with totalPages=1 when no results', async () => {
+    prisma.product.count.mockResolvedValueOnce(0)
+    prisma.product.findMany.mockResolvedValueOnce([])
+
+    const res = await service.list({ page: 3, pageSize: 10 } as any)
+    expect(res).toEqual({ data: [], page: 3, pageSize: 10, total: 0, totalPages: 1 })
+  })
+
+  it('maps Prisma P2025 on update to NotFoundException', async () => {
+    const err = new Prisma.PrismaClientKnownRequestError('Not found', {
+      code: 'P2025',
+      clientVersion: '5.22.0',
+    } as any)
+    prisma.product.update.mockRejectedValueOnce(err as any)
+
+    await expect(service.update('missing-id', { name: 'X' } as any)).rejects.toMatchObject({
+      status: 404,
+    })
+  })
 })
