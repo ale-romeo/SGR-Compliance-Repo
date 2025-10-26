@@ -6,3 +6,5 @@ pnpm-debug.log*
 .git
 .vscode
 .env
+tsconfig.build.tsbuildinfo
+frontend/node_modules
