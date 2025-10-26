@@ -18,9 +18,10 @@ export class ProductsService {
       where.categoryId = query.categoryId;
     }
     if (query.minPrice !== undefined || query.maxPrice !== undefined) {
-      where.price = {} as any;
-      if (query.minPrice !== undefined) (where.price as any).gte = new Prisma.Decimal(query.minPrice);
-      if (query.maxPrice !== undefined) (where.price as any).lte = new Prisma.Decimal(query.maxPrice);
+      const priceFilter: Prisma.DecimalFilter = {}
+      if (query.minPrice !== undefined) priceFilter.gte = new Prisma.Decimal(query.minPrice)
+      if (query.maxPrice !== undefined) priceFilter.lte = new Prisma.Decimal(query.maxPrice)
+      where.price = priceFilter
     }
 
     const page = query.page ?? 1;
@@ -61,7 +62,7 @@ export class ProductsService {
           tags: dto.tags ?? [],
         },
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         // Optionally map foreign key errors
       }
@@ -74,11 +75,11 @@ export class ProductsService {
       const data: Prisma.ProductUncheckedUpdateInput = {};
       if (dto.name !== undefined) data.name = dto.name;
       if (dto.price !== undefined) data.price = new Prisma.Decimal(dto.price);
-      if (dto.categoryId !== undefined) data.categoryId = dto.categoryId as any; // allow null to unset
-      if (dto.tags !== undefined) (data as any).tags = dto.tags; // Prisma accepts string[] for list update
+      if (dto.categoryId !== undefined) data.categoryId = dto.categoryId; // allow null to unset
+      if (dto.tags !== undefined) data.tags = dto.tags as string[];
 
       return await this.prisma.product.update({ where: { id }, data });
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
         // record not found
         throw new NotFoundException('Product not found');
@@ -90,7 +91,7 @@ export class ProductsService {
   async remove(id: string) {
     try {
       await this.prisma.product.delete({ where: { id } });
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
         throw new NotFoundException('Product not found');
       }

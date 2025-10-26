@@ -14,7 +14,7 @@ export class CategoriesService {
   async create(dto: CreateCategoryDto) {
     try {
       return await this.prisma.category.create({ data: { name: dto.name } });
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
         throw new ConflictException('Category name already exists');
       }

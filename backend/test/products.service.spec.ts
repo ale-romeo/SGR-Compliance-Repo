@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProductsService } from '../src/products/products.service'
 import { PrismaService } from '../src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'

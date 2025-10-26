@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CategoriesService } from '../src/categories/categories.service'
 import { PrismaService } from '../src/prisma/prisma.service'
 import { ConflictException } from '@nestjs/common'
